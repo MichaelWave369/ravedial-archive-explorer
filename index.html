@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090512">
+  <meta name="description" content="Search, queue, and play rave-history recordings preserved by the Internet Archive.">
+  <title>RaveDial Archive Explorer</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="RaveDial home">
+      <span class="brand-mark" aria-hidden="true">RD</span>
+      <span>
+        <strong>RaveDial</strong>
+        <small>Archive Explorer</small>
+      </span>
+    </a>
+    <div class="header-actions">
+      <span id="source-status" class="status-pill" role="status">Loading archive signal…</span>
+      <a class="ghost-link" href="https://archive.org/details/RaveDownloads" target="_blank" rel="noreferrer">Original archive ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">Internet Archive signal receiver</p>
+        <h1 id="hero-title">Tune into rave history.</h1>
+        <p class="hero-copy">Search the tapes, build a queue, save your favorites, and stream every available recording from its original archival source.</p>
+      </div>
+      <div class="signal-display" aria-hidden="true">
+        <div class="signal-bars">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span>ARCHIVE SIGNAL</span>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Archive summary">
+      <article><span id="stat-tracks">—</span><small>playable recordings</small></article>
+      <article><span id="stat-years">—</span><small>detected years</small></article>
+      <article><span id="stat-formats">—</span><small>audio formats</small></article>
+      <article><span id="stat-favorites">0</span><small>saved favorites</small></article>
+    </section>
+
+    <section class="control-deck" aria-label="Archive controls">
+      <label class="search-field">
+        <span>Search the archive</span>
+        <input id="search" type="search" placeholder="DJ, MC, rave, venue, city, year…" autocomplete="off">
+      </label>
+      <label>
+        <span>Year</span>
+        <select id="year-filter"><option value="">All years</option></select>
+      </label>
+      <label>
+        <span>Format</span>
+        <select id="format-filter"><option value="">All formats</option></select>
+      </label>
+      <label>
+        <span>Folder</span>
+        <select id="folder-filter"><option value="">All folders</option></select>
+      </label>
+      <label>
+        <span>Sort</span>
+        <select id="sort-select">
+          <option value="path">Archive order</option>
+          <option value="title">Title A–Z</option>
+          <option value="year-desc">Newest year</option>
+          <option value="year-asc">Oldest year</option>
+          <option value="size-desc">Largest files</option>
+        </select>
+      </label>
+      <div class="deck-buttons">
+        <button id="random-button" class="primary-button" type="button">⚡ Random tape</button>
+        <button id="favorites-button" class="secondary-button" type="button" aria-pressed="false">♡ Favorites</button>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="library-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">The crates</p>
+            <h2>Recordings</h2>
+          </div>
+          <span id="result-count" aria-live="polite">Loading…</span>
+        </div>
+        <div id="empty-state" class="empty-state" hidden>
+          <strong>No signal found.</strong>
+          <span>Try a different DJ, event, year, or folder.</span>
+        </div>
+        <div id="track-list" class="track-list" aria-live="polite"></div>
+        <button id="load-more" class="load-more" type="button" hidden>Load more recordings</button>
+      </div>
+
+      <aside class="queue-panel" aria-labelledby="queue-title">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">Next up</p>
+            <h2 id="queue-title">Queue</h2>
+          </div>
+          <button id="clear-queue" class="text-button" type="button">Clear</button>
+        </div>
+        <ol id="queue-list" class="queue-list"></ol>
+        <p id="queue-empty" class="queue-empty">Your queue is empty. Add a recording from the crates.</p>
+      </aside>
+    </section>
+
+    <section class="provenance-note">
+      <strong>Archive-first by design.</strong>
+      <span>RaveDial is an independent discovery interface. Audio is streamed from the Internet Archive item <code>RaveDownloads</code>; recording rights remain with their respective holders.</span>
+    </section>
+  </main>
+
+  <footer class="player-shell" id="player-shell">
+    <div class="now-playing">
+      <span class="live-dot" aria-hidden="true"></span>
+      <div>
+        <small>Now playing</small>
+        <strong id="now-title">Choose a recording</strong>
+        <span id="now-meta">RaveDial is standing by.</span>
+      </div>
+    </div>
+    <div class="transport">
+      <button id="previous-button" type="button" aria-label="Previous recording">⏮</button>
+      <audio id="audio" controls preload="metadata"></audio>
+      <button id="next-button" type="button" aria-label="Next recording">⏭</button>
+    </div>
+    <a id="now-source" class="source-button disabled" href="#" target="_blank" rel="noreferrer" aria-disabled="true">Source ↗</a>
+  </footer>
+
+  <template id="track-template">
+    <article class="track-card">
+      <button class="play-button" type="button" aria-label="Play recording">▶</button>
+      <div class="track-copy">
+        <h3></h3>
+        <p class="track-meta"></p>
+        <p class="track-path"></p>
+      </div>
+      <div class="track-actions">
+        <button class="favorite-button" type="button" aria-label="Save favorite" aria-pressed="false">♡</button>
+        <button class="queue-button" type="button">+ Queue</button>
+        <a class="archive-link" target="_blank" rel="noreferrer" aria-label="Open file at Internet Archive">↗</a>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
