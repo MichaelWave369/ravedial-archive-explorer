@@ -1,0 +1,10 @@
+{
+  "name": "RaveDial Archive Explorer",
+  "short_name": "RaveDial",
+  "description": "Search and play rave-history recordings preserved by the Internet Archive.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090512",
+  "theme_color": "#090512",
+  "icons": []
+}
